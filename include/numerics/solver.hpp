@@ -8,8 +8,8 @@ struct SolverParameters {
   double temperature;
 
   int max_iter = 0;
-  double absolute_tolerance = 0.0;
-  double relative_tolerance = 0.0;
+  double absolute_tolerance = 0;
+  double relative_tolerance = 0;
 };
 
 struct SolverResults {
@@ -48,12 +48,16 @@ public:
 		                    const Eigen::VectorXd& concentrations);
   Eigen::VectorXd compute_jacobian(const Eigen::VectorXd& gamma, 
 		                   const Eigen::VectorXd& concentrations) const;
+
+  int system_size() { return this->mixture.elements.size() + 1; }
 private:
   const Mixture& mixture;
   const StatSumCache& statsums;
   const SolverParameters& params;
   Eigen::VectorXd initial_distribution; //mole fractions of components [dimensionless]
+  const int system_size;
 };
+
 
 class InitialGuessFinder {
   
@@ -64,8 +68,8 @@ class NewtonSolver {
 public:
   struct Options {
     size_t max_iter = 100;
-    double absolute_tolerance = 1e-10;
-    double relative_tolerance = 1e-8;
+    double residual_tolerance = 1e-10;
+    double step_tolerance = 1e-8;
   };
 
   SolverResult solve(const EquilibriumSystem& system, 
@@ -74,7 +78,7 @@ private:
   Options options;
 
   bool check_convergence(const Eigen::VectorXd& residuals,
-		         const Eigen::VectorXd& error,
+                         const Eigen::VectorXd& step,
 			 const size_t& iter) const;
 
 };
@@ -101,7 +105,7 @@ Eigen::VectorXd potentials_to_concentrations(const Eigen::VectorXd& gamma,
 		                             const Eigen::VectorXd& lnZ,
 					     const Eigen::MatrixXi& stoichiometry) const;
 
-Eigen::MatrixXi& concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,
+Eigen::VectorXd& concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,
                                                   double total_density) const;
 
 bool check_element_conservation(const Eigen::VectorXd& concentrations,
