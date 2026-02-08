@@ -1,3 +1,5 @@
+#include <string> 
+#include <vector>
 #include <Eigen/Dense>
 struct Component {
   std::string name;
@@ -11,12 +13,27 @@ struct Component {
 
 struct Element {
   std::string name;
-  Eigen::VectorXd stoichiometry;
+  Eigen::VectorXi stoichiometry;
 };
 
 class Mixture {
 public:
-  const std::vector<Component>& get_components { return components;}
+  Mixture(const std::vector<Component>& components, 
+          const std::vector<Element> elements elements)
+  : components(components), elements(elements) {
+
+  int n = components.size();
+  int m = elements.size();
+  Eigen::MatrixXi phi = Eigen::MatrixXi::Zero(n,m);
+  for(int j = 0; j < m; ++j) {
+    for(int i = 0; i < n; ++i) {
+      phi(i,j) = elements[j].stoichiometry[i];
+    }
+  }
+  this->stoichiometry_matrix = phi;
+}
+  const std::vector<Component>& components() const { return components;}
+  const std::vector<Elements>& elements() const { return elements;}
 private:
   std::vector<Component> components;
   std::vector<Element> elements;

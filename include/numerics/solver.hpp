@@ -1,5 +1,8 @@
 #pragma once
 #include <Eigen/Dense>
+#include <cmath>
+#include <stdexcept>
+#include "types.hpp"
 
 namespace EquilibriumSolver {
 
@@ -7,12 +10,23 @@ struct SolverParameters {
   double pressure;
   double temperature;
 
+  Eigen::VectorXd initial_mole_fractions;
+
   int max_iter = 0;
-  double absolute_tolerance = 0;
-  double relative_tolerance = 0;
+  double residual_tolerance = 0;
+  double step_tolerance = 0;
+
+  void validate() const {
+    if (pressure <= 0) throw std::invalid_argument("Pressure must be positive");
+    if (temperature <= 0) throw std::invalid_argument("Temperature must be positive");
+    if (initial_mole_fractions.size() == 0)
+        throw std::invalid_argument("Initial mole fractions must be provided");
+    if (std::abs(initial_mole_fractions.sum() - 1.0) > 1e-10)
+        throw std::invalid_argument("Initial mole fractions must sum to 1");
+  }
 };
 
-struct SolverResults {
+struct SolverResult {
   bool success = false;
   std::string err_msg;
   int iterations = 0;
@@ -21,9 +35,10 @@ struct SolverResults {
   Eigen::VectorXd mole_fractions;
   Eigen::VectorXd concentrations;
   Eigen::VectorXd chemical_potentials;
+  double log_total_density;
 
-  double total_density;
-  double total_pressure;
+  double total_density() const { return std::exp(log_total_density); }
+  double total_pressure(double T) const { return concentrations.sum() * Constants::K * T; }
 };
 
 class StatSumCache {
@@ -41,27 +56,44 @@ private:
 
 class EquilibriumSystem {
 public: 
-  EquilibriumSystem(const Mixture& mixture, const StatSumCache& statsums, const SolverParameters& params);
+  EquilibriumSystem(const Mixture& mixture, 
+                    const StatSumCache& statsums, 
+                    const SolverParameters& params);
   
-  Eigen::VectorXd compute_concentrations(const Eigen::VectorXd& gamma) const;
-  Eigen::VectorXd compute_residuals(const Eigen::VectorXd& gamma, 
+  Eigen::VectorXd compute_concentrations(const Eigen::VectorXd& x) const;
+  Eigen::VectorXd compute_residuals(const Eigen::VectorXd& x, 
 		                    const Eigen::VectorXd& concentrations);
-  Eigen::VectorXd compute_jacobian(const Eigen::VectorXd& gamma, 
+  Eigen::VectorXd compute_jacobian(const Eigen::VectorXd& x, 
 		                   const Eigen::VectorXd& concentrations) const;
 
-  int system_size() { return this->mixture.elements.size() + 1; }
+  inline int system_size() const { return Ne_ + 1; }
+  const Mixture& mixture() const { return mixture; }
+  const SolverParameters& params() const { return params; }
 private:
   const Mixture& mixture;
   const StatSumCache& statsums;
   const SolverParameters& params;
-  Eigen::VectorXd initial_distribution; //mole fractions of components [dimensionless]
-  const int system_size;
+
+  int Ns_;
+  int Ne_;
+  //Eigen::VectorXd initial_mole; //mole fractions of components [dimensionless]
+  
 };
 
 
 class InitialGuessFinder {
-  
-
+  public:
+    static Eigen::VectorXd find(const Mixture& mixture,
+                                const StatSumCache& statsums,
+                                const SolverParameters& params);    
+private:
+  static Eigen::VectorXd solve_for_gamma(const Mixture& mixture,
+                                          const Eigen::VectorXd& lnZ,
+                                          const Eigen::VectorXd& initial_chi,
+                                          double pressure,
+                                          double temperature);
+  static std::vector<int> select_equations(const Mixture& mixture,
+                                            const Eigen::VectorXd& initial_chi);
 };
 
 class NewtonSolver {
@@ -75,7 +107,7 @@ public:
   SolverResult solve(const EquilibriumSystem& system, 
 		     const Eigen::VectorXd& initial_guess);
 private:
-  Options options;
+  NewtonSolver::Options options;
 
   bool check_convergence(const Eigen::VectorXd& residuals,
                          const Eigen::VectorXd& step,
