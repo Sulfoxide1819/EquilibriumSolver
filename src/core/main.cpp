@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include <Eigen/Dense>
 #include "core/constants.hpp"
 #include "core/types.hpp"
@@ -140,7 +141,7 @@ int main() {
         bool conservation_ok = EquilibriumUtils::check_element_conservation(
             result.concentrations, 
             initial_concentrations, 
-            mixture.stoichiometry_matrix
+            mixture.get_stoichiometry()
         );
         cout << "\nElement conservation: " << (conservation_ok ? "OK" : "VIOLATED") << "\n";
         

@@ -2,7 +2,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <stdexcept>
-#include "types.hpp"
+#include "core/types.hpp"
+#include "core/constants.hpp"
 
 namespace EquilibriumSolver {
 
@@ -38,7 +39,7 @@ struct SolverResult {
   double log_total_density;
 
   double total_density() const { return std::exp(log_total_density); }
-  double total_pressure(double T) const { return concentrations.sum() * Constants::K * T; }
+  double total_pressure(double T) const { return concentrations.sum() * K * T; }
 };
 
 class StatSumCache {
@@ -62,13 +63,13 @@ public:
   
   Eigen::VectorXd compute_concentrations(const Eigen::VectorXd& x) const;
   Eigen::VectorXd compute_residuals(const Eigen::VectorXd& x, 
-		                    const Eigen::VectorXd& concentrations);
+		                    const Eigen::VectorXd& concentrations) const;
   Eigen::VectorXd compute_jacobian(const Eigen::VectorXd& x, 
 		                   const Eigen::VectorXd& concentrations) const;
 
   inline int system_size() const { return Ne_ + 1; }
-  const Mixture& mixture() const { return mixture; }
-  const SolverParameters& params() const { return params; }
+  const Mixture& get_mixture() const { return mixture; }
+  const SolverParameters& get_params() const { return params; }
 private:
   const Mixture& mixture;
   const StatSumCache& statsums;
@@ -135,10 +136,10 @@ namespace EquilibriumUtils {
 
 Eigen::VectorXd potentials_to_concentrations(const Eigen::VectorXd& gamma,
 		                             const Eigen::VectorXd& lnZ,
-					     const Eigen::MatrixXi& stoichiometry) const;
+					     const Eigen::MatrixXi& stoichiometry);
 
-Eigen::VectorXd& concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,
-                                                  double total_density) const;
+Eigen::VectorXd concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,
+                                                  double total_density);
 
 bool check_element_conservation(const Eigen::VectorXd& concentrations,
 		                const Eigen::VectorXd& initial_concentrations,
@@ -146,7 +147,7 @@ bool check_element_conservation(const Eigen::VectorXd& concentrations,
                                 double tolerance = 1e-10);
 
 void validate_mixture(const Mixture& mixture);
-void validate_params(const SolverParameters& params);
+void validate_params(const EquilibriumSolver::SolverParameters& params);
 
 
 }//namespace EquilibriumUtils

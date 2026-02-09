@@ -1,3 +1,5 @@
+#pragma once
+#include "core/types.hpp"
 class StatSum {
 public:
   static double translational(const Component& comp, double T);

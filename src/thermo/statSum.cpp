@@ -1,6 +1,8 @@
 #include <numbers>
 #include <cmath>
-#include "constants.hpp"
+#include "thermo/statSum.hpp"
+#include "core/constants.hpp"
+#include "core/types.hpp"
 using std::numbers::pi;
 double StatSum::translational (const Component& comp, double T) {
   double base = 2 * pi * K * T / (h * h) * comp.molar_mass / NA; 

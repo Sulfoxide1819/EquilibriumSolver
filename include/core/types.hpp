@@ -1,3 +1,4 @@
+#pragma once
 #include <string> 
 #include <vector>
 #include <Eigen/Dense>
@@ -19,7 +20,7 @@ struct Element {
 class Mixture {
 public:
   Mixture(const std::vector<Component>& components, 
-          const std::vector<Element> elements elements)
+          const std::vector<Element>& elements)
   : components(components), elements(elements) {
 
   int n = components.size();
@@ -32,8 +33,9 @@ public:
   }
   this->stoichiometry_matrix = phi;
 }
-  const std::vector<Component>& components() const { return components;}
-  const std::vector<Elements>& elements() const { return elements;}
+  const std::vector<Component>& get_components() const { return components;}
+  const std::vector<Element>& get_elements() const { return elements;}
+  const Eigen::MatrixXi& get_stoichiometry() const { return stoichiometry_matrix; }
 private:
   std::vector<Component> components;
   std::vector<Element> elements;
