@@ -64,7 +64,7 @@ public:
   Eigen::VectorXd compute_concentrations(const Eigen::VectorXd& x) const;
   Eigen::VectorXd compute_residuals(const Eigen::VectorXd& x, 
 		                    const Eigen::VectorXd& concentrations) const;
-  Eigen::VectorXd compute_jacobian(const Eigen::VectorXd& x, 
+  Eigen::MatrixXd compute_jacobian(const Eigen::VectorXd& x, 
 		                   const Eigen::VectorXd& concentrations) const;
 
   inline int system_size() const { return Ne_ + 1; }
@@ -100,9 +100,9 @@ private:
 class NewtonSolver {
 public:
   struct Options {
-    size_t max_iter = 100;
-    double residual_tolerance = 1e-10;
-    double step_tolerance = 1e-8;
+    size_t max_iter = 1e4;
+    double residual_tolerance = 1e+10;
+    double step_tolerance = 1e-12;
   };
 
   SolverResult solve(const EquilibriumSystem& system, 
@@ -144,7 +144,7 @@ Eigen::VectorXd concentrations_to_mole_fractions(const Eigen::VectorXd& concentr
 bool check_element_conservation(const Eigen::VectorXd& concentrations,
 		                const Eigen::VectorXd& initial_concentrations,
                                 const Eigen::MatrixXi& stoichiometry,
-                                double tolerance = 1e-10);
+                                double tolerance = 1e-6);
 
 void validate_mixture(const Mixture& mixture);
 void validate_params(const EquilibriumSolver::SolverParameters& params);

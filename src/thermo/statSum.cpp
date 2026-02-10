@@ -3,9 +3,14 @@
 #include "thermo/statSum.hpp"
 #include "core/constants.hpp"
 #include "core/types.hpp"
+
+#include <iostream> //delete later
+
 using std::numbers::pi;
 double StatSum::translational (const Component& comp, double T) {
   double base = 2 * pi * K * T / (h * h) * comp.molar_mass / NA; 
+  double Z_tr = std::pow(base, 1.5);
+  //std::cout << "Z_tr ( " << comp.name << " ): " << Z_tr << "\n";
   return std::pow(base, 1.5);
 }
 double StatSum::rotational(const Component& comp, double T) {

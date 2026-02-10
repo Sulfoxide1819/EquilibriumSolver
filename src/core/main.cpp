@@ -11,6 +11,7 @@ using namespace EquilibriumSolver;
 using namespace std;
 
 int main() {
+    cout << "=== Starting Equilibrium Solver ===" << endl;
     // Создаем компоненты для 5-компонентного воздуха (N, O, N2, O2, NO)
     vector<Component> components = {
         // N (атомный азот)
@@ -77,10 +78,15 @@ int main() {
             (Eigen::VectorXi(5) << 0, 1, 0, 2, 1).finished() // O в N, O, N2, O2, NO
         }
     };
-
+    //Отладка
+    cout << "Number of components (Ns): " << components.size() << endl;
+    cout << "Number of elements (Ne): " << elements.size() << endl;
     // Создаем смесь
     Mixture mixture(components, elements);
-
+    //Отладка
+    const auto& phi = mixture.get_stoichiometry();
+    cout << "Stoichiometry matrix size: " << phi.rows() << " x " << phi.cols() << endl;
+    cout << "Stoichiometry matrix:\n" << phi << endl;
     // Создаем калькулятор
     EquilibriumCalculator calculator(mixture);
 
@@ -124,7 +130,7 @@ int main() {
         cout << "\nEquilibrium composition:\n";
         
         // Выводим мольные доли и концентрации
-        cout << fixed << setprecision(6);
+        //cout << fixed << setprecision(6);
         for (int i = 0; i < result.mole_fractions.size(); ++i) {
             cout << "  " << components[i].name << ":\n";
             cout << "    Mole fraction: " << result.mole_fractions(i) << "\n";
@@ -136,19 +142,11 @@ int main() {
             cout << "  " << elements[i].name << ": " << result.chemical_potentials(i) << "\n";
         }
         
-        // Проверка сохранения элементов
-        Eigen::VectorXd initial_concentrations = params.initial_mole_fractions * result.total_density();
-        bool conservation_ok = EquilibriumUtils::check_element_conservation(
-            result.concentrations, 
-            initial_concentrations, 
-            mixture.get_stoichiometry()
-        );
-        cout << "\nElement conservation: " << (conservation_ok ? "OK" : "VIOLATED") << "\n";
-        
     } catch (const exception& e) {
         cerr << "Error: " << e.what() << endl;
         return 1;
     }
     
+  
     return 0;
 }
