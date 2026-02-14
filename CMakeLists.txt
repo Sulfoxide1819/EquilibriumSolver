@@ -29,6 +29,7 @@ add_executable(ryad-solver
 	src/core/main.cpp
 	src/numerics/solver.cpp
 	src/thermo/statSum.cpp
+	src/core/utils.cpp
 )
 
 target_include_directories(ryad-solver PRIVATE ${EIGEN3_INCLUDE_DIR})
