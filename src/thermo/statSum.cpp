@@ -17,8 +17,12 @@ double StatSum::rotational(const Component& comp, double T) {
 }
 double StatSum::vibrational(const Component& comp, double T) {
   if (comp.is_atomic) return 1.0;
-  double denom = 1 - std::exp(-h * c * comp.vibrational_freq / (K * T));
-  return (denom > 0) ? 1/denom : 1.0;
+  double Z_vib = 1;
+  for(const auto& freq : comp.vibrational_freq){
+    double denom = 1 - std::exp(-h * c * freq / (K * T));
+    Z_vib *= (denom > 0) ? 1/denom : 1.0;
+  }
+  return Z_vib;
 }
 
 double StatSum::electronic(const Component& comp, double T){
