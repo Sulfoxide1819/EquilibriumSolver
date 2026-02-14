@@ -98,6 +98,7 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
   int iter = 0;
   do {
     concentrations = system.compute_concentrations(x.head(n - 1));
+    std::cout << "conc:" << concentrations << "\n";
     residuals = system.compute_residuals(x, concentrations);
     Eigen::MatrixXd jacobian = system.compute_jacobian(x, concentrations);
     dx = jacobian.partialPivLu().solve(residuals);
@@ -151,6 +152,7 @@ Eigen::VectorXd InitialGuessFinder::solve_for_gamma(const Mixture& mixture,
   for(int i = 0; i < Ne; ++i){
     A.row(i) = phi.row(select[i]).cast<double>();
   }
+  std::cout << A;
   return A.partialPivLu().solve(b);
 
 }

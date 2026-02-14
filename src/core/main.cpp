@@ -15,9 +15,9 @@ using namespace std;
 int main() {
     cout << "=== Starting Equilibrium Solver ===" << endl;
 
-    vector<Component> components = {Component("N"),Component("O"), Component("N2"), Component("O2"), Component("NO")};
-
-
+    //vector<Component> components = {Component("N"),Component("O"), Component("N2"), Component("O2"), Component("NO")};
+    //vector<Component> components = {Component("e-"),Component("N"),Component("O"), Component("Ar"), Component("N2"), Component("O2"),Component("NO"),Component("N+"),Component("O+"),Component("Ar+"),Component("NO+")};
+    vector<Component> components = {Component("C"),Component("O"), Component("CO"), Component("CO2"), Component("O2")};
     // Создаем компоненты для 5-компонентного воздуха (N, O, N2, O2, NO)
     /*vector<Component> components = {
         // N (атомный азот)
@@ -74,8 +74,8 @@ int main() {
 
     // Создаем элементы (N и O)
     // Стехиометрия: для каждого элемента вектор из 5 значений (N, O, N2, O2, NO)
-    vector<Element> elements = {
-        
+    vector<Element> elements1 = {
+    
             Element("N"),
             //(Eigen::VectorXi(5) << 1, 0, 2, 0, 1).finished() // N в N, O, N2, O2, NO
             //{1,0,2,0,1}
@@ -86,19 +86,18 @@ int main() {
             //{0,1,0,2,1}
         
     };
-    elements[0].stoichiometry = {1,0,2,0,1};
-    elements[1].stoichiometry = {0,1,0,2,1};
     ifstream f("../data/molecules.json");
     nlohmann::json data = nlohmann::json::parse(f);
     for(auto& comp : components){
       MixtureBuild::pull_properties(data, comp);
     }
-    vector<Element> elements1 = {Element("N"), Element("O")};
-    for(auto& el : elements1) {
+    //vector<Element> elements = {Element("e-"), Element("N"), Element("O"), Element("Ar")};
+    vector<Element> elements = {Element("C"), Element("O")};
+    for(auto& el : elements) {
       MixtureBuild::get_stoichiometry(data, el, components);
     }   
  // Создаем смесь
-    Mixture mixture(components, elements1);
+    Mixture mixture(components, elements);
     cout << mixture.get_stoichiometry() << "\n";
     //cout << InitialGuessFinder::select_equations(mixture, (Eigen::VectorXd(5) << 0.0, 0.0, 0.2, 0.8, 0.0).finished());
     // Создаем калькулятор
@@ -107,11 +106,13 @@ int main() {
     // Параметры расчета: p = 0.001 * p0 = 101.325 Па, T = 1500 K
     SolverParameters params;
     params.pressure = 1 * 101.325; // Па
-    params.temperature = 6000.0; // K
+    params.temperature = 500.0; // K
     
     // Начальные мольные доли (недиссоциированный воздух: 80% N2, 20% O2)
-    Eigen::VectorXd initial_mole_frac(5);
-    initial_mole_frac << 0.0, 0.0, 0.8, 0.2, 0.0;
+    Eigen::VectorXd initial_mole_frac(components.size());
+    //initial_mole_frac << 0.0, 0.0, 0.8, 0.2, 0.0;
+    //initial_mole_frac << 0.0, 0.0, 0.0, 0.01, 0.78, 0.21 , 0.0, 0.0, 0.0, 0.0, 0.0;
+    initial_mole_frac << 0.4, 0.4, 0.2, 0.0, 0.0; 
     params.initial_mole_fractions = initial_mole_frac;
     
     params.max_iter = 100;
@@ -161,6 +162,5 @@ int main() {
         return 1;
     }
     
-  
     return 0;
 }
