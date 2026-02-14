@@ -2,7 +2,7 @@
 #include <nlohmann/json.hpp>
 #include <vector>
 #include "core/types.hpp"
-#include "core/utils.hpp"
+#include "core/parse_utils.hpp"
 #include <stdexcept>
 
 using json = nlohmann::json;
@@ -25,7 +25,7 @@ using json = nlohmann::json;
       } 
      } else {
           comp.dissociation_energy = comp_data["dissociation_energy"].get<double>();
-          comp.vibrational_freq = comp_data["vibrational_freq"].get<double>();
+          comp.vibrational_freq = comp_data["vibrational_freq"].get<std::vector<double>>();
           comp.rotational_const = comp_data["rotational_const"].get<double>();
           comp.symmetry_factor = comp_data["symmetry_factor"].get<int>();
      }

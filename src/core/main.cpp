@@ -7,7 +7,7 @@
 #include "core/types.hpp"
 #include "thermo/statSum.hpp"
 #include "numerics/solver.hpp"
-#include "core/utils.hpp"
+#include "core/parse_utils.hpp"
 
 using namespace EquilibriumSolver;
 using namespace std;
