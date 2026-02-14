@@ -38,7 +38,7 @@ struct SolverResult {
   Eigen::VectorXd chemical_potentials;
   double log_total_density;
 
-  double total_density() const { return std::exp(log_total_density); }
+  double total_density() const { return /*std::exp(log_total_density);*/ concentrations.sum(); }
   double total_pressure(double T) const { return concentrations.sum() * K * T; }
 };
 
@@ -49,9 +49,11 @@ public:
   void update(double temperature);
 
   const Eigen::VectorXd& get_lnZ() const { return lnZ_; }
+  const Eigen::VectorXd& get_Z() const { return Z_; }
 private:
   const Mixture& mixture;
   double cached_temperature = 0.0;
+  Eigen::VectorXd Z_;
   Eigen::VectorXd lnZ_;
 };
 
@@ -87,20 +89,18 @@ class InitialGuessFinder {
     static Eigen::VectorXd find(const Mixture& mixture,
                                 const StatSumCache& statsums,
                                 const SolverParameters& params);    
-private:
+//private:
   static Eigen::VectorXd solve_for_gamma(const Mixture& mixture,
                                           const Eigen::VectorXd& lnZ,
-                                          const Eigen::VectorXd& initial_chi,
-                                          double pressure,
-                                          double temperature);
+                                          const Eigen::VectorXd& initial_chi);
   static std::vector<int> select_equations(const Mixture& mixture,
-                                            const Eigen::VectorXd& initial_chi);
+                                          const Eigen::VectorXd& initial_chi);
 };
 
 class NewtonSolver {
 public:
   struct Options {
-    size_t max_iter = 1e4;
+    size_t max_iter = 1e2;
     double residual_tolerance = 1e+10;
     double step_tolerance = 1e-12;
   };
@@ -138,8 +138,7 @@ Eigen::VectorXd potentials_to_concentrations(const Eigen::VectorXd& gamma,
 		                             const Eigen::VectorXd& lnZ,
 					     const Eigen::MatrixXi& stoichiometry);
 
-Eigen::VectorXd concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,
-                                                  double total_density);
+Eigen::VectorXd concentrations_to_mole_fractions(const Eigen::VectorXd& concentrations,  double total_density);
 
 bool check_element_conservation(const Eigen::VectorXd& concentrations,
 		                const Eigen::VectorXd& initial_concentrations,

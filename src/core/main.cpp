@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <iomanip>
 #include <Eigen/Dense>
@@ -6,14 +7,19 @@
 #include "core/types.hpp"
 #include "thermo/statSum.hpp"
 #include "numerics/solver.hpp"
+#include "core/utils.hpp"
 
 using namespace EquilibriumSolver;
 using namespace std;
 
 int main() {
     cout << "=== Starting Equilibrium Solver ===" << endl;
+
+    vector<Component> components = {Component("N"),Component("O"), Component("N2"), Component("O2"), Component("NO")};
+
+
     // Создаем компоненты для 5-компонентного воздуха (N, O, N2, O2, NO)
-    vector<Component> components = {
+    /*vector<Component> components = {
         // N (атомный азот)
         {
             "N",                    // name
@@ -64,36 +70,44 @@ int main() {
             1,                      // symmetry_factor (гетероядерный)
             false                   // is_atomic
         }
-    };
+    };*/
 
     // Создаем элементы (N и O)
     // Стехиометрия: для каждого элемента вектор из 5 значений (N, O, N2, O2, NO)
     vector<Element> elements = {
-        {
-            "N",
-            (Eigen::VectorXi(5) << 1, 0, 2, 0, 1).finished() // N в N, O, N2, O2, NO
-        },
-        {
-            "O",
-            (Eigen::VectorXi(5) << 0, 1, 0, 2, 1).finished() // O в N, O, N2, O2, NO
-        }
+        
+            Element("N"),
+            //(Eigen::VectorXi(5) << 1, 0, 2, 0, 1).finished() // N в N, O, N2, O2, NO
+            //{1,0,2,0,1}
+        
+        
+            Element("O")
+            //(Eigen::VectorXi(5) << 0, 1, 0, 2, 1).finished() // O в N, O, N2, O2, NO
+            //{0,1,0,2,1}
+        
     };
-    //Отладка
-    cout << "Number of components (Ns): " << components.size() << endl;
-    cout << "Number of elements (Ne): " << elements.size() << endl;
-    // Создаем смесь
-    Mixture mixture(components, elements);
-    //Отладка
-    const auto& phi = mixture.get_stoichiometry();
-    cout << "Stoichiometry matrix size: " << phi.rows() << " x " << phi.cols() << endl;
-    cout << "Stoichiometry matrix:\n" << phi << endl;
+    elements[0].stoichiometry = {1,0,2,0,1};
+    elements[1].stoichiometry = {0,1,0,2,1};
+    ifstream f("../data/molecules.json");
+    nlohmann::json data = nlohmann::json::parse(f);
+    for(auto& comp : components){
+      MixtureBuild::pull_properties(data, comp);
+    }
+    vector<Element> elements1 = {Element("N"), Element("O")};
+    for(auto& el : elements1) {
+      MixtureBuild::get_stoichiometry(data, el, components);
+    }   
+ // Создаем смесь
+    Mixture mixture(components, elements1);
+    cout << mixture.get_stoichiometry() << "\n";
+    //cout << InitialGuessFinder::select_equations(mixture, (Eigen::VectorXd(5) << 0.0, 0.0, 0.2, 0.8, 0.0).finished());
     // Создаем калькулятор
     EquilibriumCalculator calculator(mixture);
 
     // Параметры расчета: p = 0.001 * p0 = 101.325 Па, T = 1500 K
     SolverParameters params;
-    params.pressure = 101.325; // Па
-    params.temperature = 1500.0; // K
+    params.pressure = 1 * 101.325; // Па
+    params.temperature = 6000.0; // K
     
     // Начальные мольные доли (недиссоциированный воздух: 80% N2, 20% O2)
     Eigen::VectorXd initial_mole_frac(5);
