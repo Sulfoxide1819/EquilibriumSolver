@@ -8,7 +8,7 @@ struct Component {
   std::string name;
   double molar_mass = 0;
   double dissociation_energy = 0;//[J/mol]
-  double vibrational_freq = 0;
+  std::vector<double> vibrational_freq;
   double rotational_const = 0;// []
   int symmetry_factor = 1;
   
