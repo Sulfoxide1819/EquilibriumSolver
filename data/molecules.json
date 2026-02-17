@@ -448,7 +448,7 @@
   },
   "CO": {
     "molar_mass": 28.010e-3,
-    "dissociation_energy": 1.072e5,
+    "dissociation_energy": 1.072e6,
     "vibrational_freq": [2.169813e5],
     "rotational_const": 193.13,
     "symmetry_factor": 1,
@@ -461,8 +461,8 @@
   },
   "CO2": {
     "molar_mass": 44.009e-3,
-    "dissociation_energy": 5.260714e5,
-    "vibrational_freq": [1.333536e5,6.66969e5, 2.350574e5],
+    "dissociation_energy": 1.5979592e6,
+    "vibrational_freq": [1.333536e5,6.66969e4, 2.350574e5],
     "rotational_const": 39.027,
     "symmetry_factor": 2,
     "is_atomic": false,

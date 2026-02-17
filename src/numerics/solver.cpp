@@ -177,6 +177,7 @@ std::vector<int> InitialGuessFinder::select_equations(const Mixture& mixture,
       if (static_cast<bool>(select(k)) && chi > initial_chi(k) && stoichiometry(i, k) != 0) {
         select(k) = false;
         select(i) = true;
+        break;
       }
     }
   }
@@ -195,7 +196,9 @@ EquilibriumCalculator::EquilibriumCalculator(const Mixture& mixture)
 SolverResult EquilibriumCalculator::calculate(const SolverParameters& params) {
   double T = params.temperature;
   statsum_cache.update(T);
+  std::cout << statsum_cache.get_lnZ()[4];
   std::cout <<  "statsums: " << statsum_cache.get_lnZ();
+  std::cout << "jjkjk";
   EquilibriumSystem system(this->mixture, this->statsum_cache, params);
   NewtonSolver solver;
   auto results = solver.solve(system, InitialGuessFinder::find(mixture, this->statsum_cache, params));
