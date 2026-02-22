@@ -15,7 +15,6 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     if(argc == 0) throw std::runtime_error("First argument must be configuration file");
-cout << 53348.4 * 100 * NA * h * c;
     ifstream config_file(argv[1]);
     nlohmann::json config = nlohmann::json::parse(config_file);
     Read read(config);
