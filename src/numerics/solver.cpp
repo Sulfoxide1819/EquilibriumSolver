@@ -19,11 +19,15 @@ void StatSumCache::update(double temperature){
   Eigen::VectorXd statsums(this->mixture.get_components().size());
   int k = 0;
   for (const auto& comp : this->mixture.get_components()) {
-    statsums(k) = StatSum::total(comp, temperature);
+    if(comp.reduced_gibbs_energy == 0.0){
+      statsums(k) = std::log(StatSum::total(comp, temperature));
+    } else {
+      statsums(k) = StatSum::fromReducedGibbs(comp, temperature);
+    }
+   
     k++;
   }
-  this->Z_ = statsums;
-  this->lnZ_ = statsums.array().log();
+  this->lnZ_ = statsums;
   this->cached_temperature = temperature;
 }
 
@@ -42,7 +46,6 @@ Eigen::VectorXd EquilibriumSystem::compute_concentrations(const Eigen::VectorXd&
   double coeff = params.pressure / (K * NA * params.temperature);
   Eigen::VectorXd to_exp =( this->statsums.get_lnZ() + 
                            this->mixture.get_stoichiometry().cast<double>()  * gamma).array() + std::log(coeff);
-  //std::cout << "conc:" << to_exp.array().exp() << "\n";
   return to_exp.array().exp();
 }
 
@@ -56,7 +59,6 @@ Eigen::VectorXd EquilibriumSystem::compute_residuals(const Eigen::VectorXd& x,
   residuals.head(Ne_) = concentrations.transpose() * this->mixture.get_stoichiometry().cast<double>() - 
              (this->params.initial_mole_fractions.transpose() * this->mixture.get_stoichiometry().cast<double>()) * std::exp(x(Ne_));
   residuals(Ne_) = concentrations.sum() - params.pressure / (K * params.temperature);
-  //std::cout << "res:" << residuals<< "\n";
   return residuals;
 }
 
@@ -98,14 +100,11 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
   int iter = 0;
   do {
     concentrations = system.compute_concentrations(x.head(n - 1));
-    std::cout << "conc:" << concentrations << "\n";
     residuals = system.compute_residuals(x, concentrations);
     Eigen::MatrixXd jacobian = system.compute_jacobian(x, concentrations);
     dx = jacobian.partialPivLu().solve(residuals);
-    //std::cout << "dx:" << dx << "\n";
     x -= dx;
     ++iter;
-    //std::cout << "x:"<< x << "\n";
   } while(!check_convergence(residuals, dx, iter));
 
   SolverResult res;
@@ -133,7 +132,6 @@ Eigen::VectorXd InitialGuessFinder::find(const Mixture& mixture,
   //initial_guess(0) /= 2;
   //initial_guess(1) /= 2;
   //initial_guess(2) = 150;
-  std::cout << "init_guess: "<< Ne << " " << initial_guess << "\n";
   return initial_guess;
 }
 
@@ -152,7 +150,6 @@ Eigen::VectorXd InitialGuessFinder::solve_for_gamma(const Mixture& mixture,
   for(int i = 0; i < Ne; ++i){
     A.row(i) = phi.row(select[i]).cast<double>();
   }
-  std::cout << A;
   return A.partialPivLu().solve(b);
 
 }
@@ -196,9 +193,6 @@ EquilibriumCalculator::EquilibriumCalculator(const Mixture& mixture)
 SolverResult EquilibriumCalculator::calculate(const SolverParameters& params) {
   double T = params.temperature;
   statsum_cache.update(T);
-  std::cout << statsum_cache.get_lnZ()[4];
-  std::cout <<  "statsums: " << statsum_cache.get_lnZ();
-  std::cout << "jjkjk";
   EquilibriumSystem system(this->mixture, this->statsum_cache, params);
   NewtonSolver solver;
   auto results = solver.solve(system, InitialGuessFinder::find(mixture, this->statsum_cache, params));

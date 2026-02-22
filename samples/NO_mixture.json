@@ -1,0 +1,6 @@
+{
+  "components":["N", "O", "N2", "O2", "NO"],
+  "temperature": 3000,
+  "pressure": 101.325,
+  "initial_mole_fractions":[0.0, 0.0, 0.8, 0.2, 0.0]
+}

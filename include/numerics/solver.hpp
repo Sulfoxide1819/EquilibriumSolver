@@ -8,7 +8,7 @@
 namespace EquilibriumSolver {
 
 struct SolverParameters {
-  double pressure;
+  double pressure = p_0;
   double temperature;
 
   Eigen::VectorXd initial_mole_fractions;

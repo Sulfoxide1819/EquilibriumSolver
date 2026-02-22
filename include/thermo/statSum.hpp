@@ -7,4 +7,5 @@ public:
   static double vibrational(const Component& comp, double T);
   static double electronic(const Component& comp, double T);
   static double total(const Component& comp, double T);
+  static double fromReducedGibbs(const Component& comp, double T);
 };

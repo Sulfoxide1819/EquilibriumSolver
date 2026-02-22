@@ -21,6 +21,11 @@ struct Component {
     int degeneracy;
   };
   std::vector<EnergyLevel> energy_levels;
+ 
+  Eigen::MatrixXd anharmonic_constants_2;
+
+  double reduced_gibbs_energy = 0.0;
+  double d_entalpy_0 = 0.0;
 };
 
 

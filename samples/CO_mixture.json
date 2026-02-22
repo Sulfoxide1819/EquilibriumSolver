@@ -1,0 +1,5 @@
+{
+  "components":["C", "O", "CO", "CO2", "O2"],
+  "temperature": 3000,
+  "initial_mole_fractions":[0.0, 0.33, 0.33, 0.33, 0.0]
+}
