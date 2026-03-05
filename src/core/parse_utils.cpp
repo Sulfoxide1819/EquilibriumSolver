@@ -3,8 +3,11 @@
 #include <vector>
 #include "core/types.hpp"
 #include "core/parse_utils.hpp"
+#include "core/constants.hpp"
+#include "thermo/models.hpp"
 #include <stdexcept>
 #include <set>
+#include <memory>
 
 using json = nlohmann::json;
 
@@ -26,26 +29,37 @@ using json = nlohmann::json;
       } 
      } 
      if(!comp.is_atomic) {
-          comp.dissociation_energy = comp_data["dissociation_energy"].get<double>();
-          comp.vibrational_freq = comp_data["vibrational_freq"].get<std::vector<double>>();
-          comp.rotational_const = comp_data["rotational_const"].get<double>();
-          comp.symmetry_factor = comp_data["symmetry_factor"].get<int>();
-          if (comp_data.contains("anharmonic_constants_2")){
-            size_t size = comp.vibrational_freq.size();
-            Eigen::MatrixXd matr= Eigen::MatrixXd::Zero(size, size);
-            size_t it = 0;
-            for(int i = 0; i < size; ++i){
-              for(int j = i; j < size; ++j){
-                matr(i, j) = comp_data["anharmonic_constants_2"].at(it).get<double>();
-                ++it;
-                comp.anharmonic_constants_2 = matr;
-              }
+       comp.dissociation_energy = comp_data["dissociation_energy"].get<double>();
+         //comp.vibrational_freq = comp_data["vibrational_freq"].get<std::vector<double>>();
+       comp.rotational_const = comp_data["rotational_const"].get<double>();
+       comp.symmetry_factor = comp_data["symmetry_factor"].get<int>();
 
-            }
-
-          }
+       std::vector<double> freqs_ = comp_data["vibrational_freq"].get<std::vector<double>>();
+       Eigen::Matrix3d anh = Eigen::Matrix3d::Zero();//anharmonic_constants_2
+       double diss_energy = comp.dissociation_energy / NA;
+       if(comp.name == "CO2"){
+         if (comp_data.contains("anharmonic_constants_2")){
+           size_t size = freqs_.size();
+           Eigen::MatrixXd matr= Eigen::MatrixXd::Zero(size, size);
+           size_t it = 0;
+           for(int i = 0; i < size; ++i){
+             for(int j = i; j < size; ++j){
+               matr(i, j) = comp_data["anharmonic_constants_2"].at(it).get<double>();
+               ++it;
+               anh = matr;
+             }
+           }
+         }
+         comp.vib_model = std::make_unique<CO2_model>(diss_energy, freqs_, anh);
+       }
+       else if(comp_data.contains("anharmonic_constants_2")){
+         std::vector<double> omega_x = comp_data["anharmonic_constants_2"].get<std::vector<double>>();
+         comp.vib_model = std::make_unique<AnharmonicOscillator>(diss_energy, freqs_, omega_x);
+       } else {
+         comp.vib_model = std::make_unique<HarmonicOscillator>(freqs_);
+       }
      }
-    }
+   }
   
   std::vector<Element> MixtureBuild::get_elements(const json& data, const std::vector<Component>& comps) {
     std::set<std::string> set_el; //set of elements

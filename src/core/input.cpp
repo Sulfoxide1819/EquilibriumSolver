@@ -7,7 +7,7 @@ using EquilibriumSolver::SolverParameters;
     if(!config["components"].is_array() || config["components"].empty()) throw std::runtime_error("'components' must be a non-empty array");
     std::vector<Component> comps;
     for(std::string& name : config.at("components").get<std::vector<std::string>>()){
-      comps.push_back(Component(name));
+      comps.push_back(std::move(Component(name)));
     }
     return comps;
 }

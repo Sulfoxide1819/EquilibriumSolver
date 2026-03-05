@@ -2,9 +2,24 @@
 #include <string> 
 #include <vector>
 #include <Eigen/Dense>
+#include <memory>
+#include "thermo/models.hpp"
 struct Component {
   Component(std::string name):name(name){}
-  
+  Component(const Component&) = delete;
+  Component& operator=(const Component&) = delete;
+  Component(Component&& other) noexcept
+    : name(std::move(other.name)),
+      molar_mass(other.molar_mass),
+      dissociation_energy(other.dissociation_energy),
+      vibrational_freq(std::move(other.vibrational_freq)),
+      rotational_const(other.rotational_const),
+      symmetry_factor(other.symmetry_factor),
+      is_atomic(other.is_atomic),
+      is_charged(other.is_charged),
+      vib_model(std::move(other.vib_model)),
+      energy_levels(std::move(other.energy_levels)) {}
+ 
   std::string name;
   double molar_mass = 0;
   double dissociation_energy = 0;//[J/mol]
@@ -15,6 +30,8 @@ struct Component {
   bool is_atomic;
   bool is_charged;
 
+  std::unique_ptr<VibrationalModel> vib_model;
+
   struct EnergyLevel {
     std::string state;
     double energy;
@@ -22,7 +39,7 @@ struct Component {
   };
   std::vector<EnergyLevel> energy_levels;
  
-  Eigen::MatrixXd anharmonic_constants_2;
+ // Eigen::MatrixXd anharmonic_constants_2;
 
   double reduced_gibbs_energy = 0.0;
   double d_entalpy_0 = 0.0;
@@ -56,7 +73,7 @@ public:
   const std::vector<Element>& get_elements() const { return elements;}
   const Eigen::MatrixXi& get_stoichiometry() const { return stoichiometry_matrix; }
 private:
-  std::vector<Component> components;
+  const std::vector<Component>& components;
   std::vector<Element> elements;
   Eigen::MatrixXi stoichiometry_matrix;
 

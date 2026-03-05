@@ -14,6 +14,7 @@ using namespace EquilibriumSolver;
 using namespace std;
 
 int main(int argc, char* argv[]) {
+  try {
     if(argc == 0) throw std::runtime_error("First argument must be configuration file");
     ifstream config_file(argv[1]);
     nlohmann::json config = nlohmann::json::parse(config_file);
@@ -47,7 +48,7 @@ int main(int argc, char* argv[]) {
     }   
  // Mixture init
     Mixture mixture(components, elements);
-    cout << mixture.get_stoichiometry() << "\n";
+ // cout << mixture.get_stoichiometry() << "\n";
     //Calculator init
     EquilibriumCalculator calculator(mixture);
 
@@ -62,8 +63,8 @@ int main(int argc, char* argv[]) {
     params.max_iter = 100;
     params.residual_tolerance = 1e-10;
     params.step_tolerance = 1e-8;
-    
-    try {
+
+//OUTPUT
         SolverResult result = calculator.calculate(params);
         
         cout << "=========================================\n";

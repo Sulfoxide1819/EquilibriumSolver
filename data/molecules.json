@@ -121,6 +121,8 @@
       }
     ],
 
+    "anharmonic_constants_2":[11.981],
+
     "stoichiometry": {
       "O": 2 
     }
@@ -526,7 +528,7 @@
         "p_i": 2
       }
     ],
-    "anharmonic_constants_2": [-3.63, 3.44, -0.635, -19.28, -12.51, -12.56],
+    "anharmonic_constants_2": [-3.63, 3.44, -19.28, -0.635, -12.51, -12.56],
     
 
     "stoichiometry": {
