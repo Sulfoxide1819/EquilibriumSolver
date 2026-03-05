@@ -1,4 +1,8 @@
 # EquilibriumSolver
+## Install dependencies
+```bash
+sudo apt install libeigen3-dev nlohmann-json3-dev
+```
 ## Build
 ```bash
 cd <source_directory>
