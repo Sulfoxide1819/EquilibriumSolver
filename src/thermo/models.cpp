@@ -19,7 +19,7 @@ double HarmonicOscillator::compute(double T) const {
 
 double AnharmonicOscillator::compute(double T) const {
     if(freqs_.size() > 1) throw std::runtime_error("AnharmonicOscillator model do not support non-diatomic molecule");
-    size_t v = 1;
+    size_t v = 0;
     double e_base = freqs_[0] * 0.5 - omega_x[0] * 0.25;
     double e = 0;
     double Z_vib = 0;
