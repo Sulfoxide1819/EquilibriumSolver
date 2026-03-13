@@ -103,7 +103,27 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
     residuals = system.compute_residuals(x, concentrations);
     Eigen::MatrixXd jacobian = system.compute_jacobian(x, concentrations);
     dx = jacobian.partialPivLu().solve(residuals);
-    x -= dx;
+    if(dx(n - 1) > 1.0) {dx(n - 1) = 1;}
+    if(dx(n - 1) < -1.0) {dx(n - 1) = -1;}
+    bool find_step = false;
+    double lambda = 1;
+    for(size_t i = 0; i < 100; ++i){
+      std::cout << iter << ":" << i << "\n";
+      Eigen::VectorXd x_test = x - lambda * dx;
+      std::cout << x_test << "\n";
+      Eigen::VectorXd conc_test = system.compute_concentrations(x_test.head(n - 1));
+      Eigen::VectorXd res_test = system.compute_residuals(x_test, conc_test);
+      if(ArmijosCond(x_test, residuals, res_test, lambda)){
+        find_step = true;
+        x = x_test;
+        break;
+      } else {
+        lambda *= 0.1;
+      }
+    }
+    std::cout << x << "\n";
+    std::cout << dx << "\n";
+    if(!find_step && !check_convergence(residuals, dx, iter)){throw std::runtime_error("Convergence error: unstable solution");}
     ++iter;
   } while(!check_convergence(residuals, dx, iter));
 
@@ -117,6 +137,11 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
   return res;
 }
 
+bool NewtonSolver::ArmijosCond(const Eigen::VectorXd& x_test, const Eigen::VectorXd& residuals, const Eigen::VectorXd& res_test, const double& lambda){
+  static double alpha = 1e-2;
+  return res_test.norm() <= (1 - lambda * alpha) * residuals.norm();
+}
+
 //InitialGuessFinder
 Eigen::VectorXd InitialGuessFinder::find(const Mixture& mixture,
                                          const StatSumCache& statsums,
@@ -128,29 +153,28 @@ Eigen::VectorXd InitialGuessFinder::find(const Mixture& mixture,
 
   double n_sigma_0 = params.pressure / (K * params.temperature);
   initial_guess(Ne) = std::log(n_sigma_0);
-  //initial_guess.head(2) << -3, -3;
-  //initial_guess(0) /= 2;
-  //initial_guess(1) /= 2;
-  //initial_guess(2) = 150;
   return initial_guess;
 }
 
 Eigen::VectorXd InitialGuessFinder::solve_for_gamma(const Mixture& mixture,
                                                     const Eigen::VectorXd& lnZ,
                                                     const Eigen::VectorXd& initial_chi){
-  int Ne = mixture.get_elements().size();
+  int Ns = mixture.get_components().size();
   const Eigen::MatrixXi& phi = mixture.get_stoichiometry();
-  std::vector<int> select = select_equations(mixture, initial_chi);
-  Eigen::VectorXd b = Eigen::VectorXd::Zero(Ne);
-  for(int i = 0; i < Ne; ++i){
-    if(initial_chi[select[i]] == 0) continue; 
-    b(i) = std::log(initial_chi(select[i])) - lnZ(select[i]) + std::log(NA);
+ // std::vector<int> select = select_equations(mixture, initial_chi);
+  Eigen::VectorXd b = Eigen::VectorXd::Zero(Ns);
+  for(int i = 0; i < Ns; ++i){
+    if(initial_chi[i] == 0) {
+      b(i) = std::log(1e-9) - lnZ(i) + std::log(NA);
+    } else {
+      b(i) = std::log(initial_chi(i)) - lnZ(i) + std::log(NA);
+    }
   }
-  Eigen::MatrixXd A = Eigen::MatrixXd::Zero(Ne, Ne);
-  for(int i = 0; i < Ne; ++i){
+  //Eigen::MatrixXd A = Eigen::MatrixXd::Zero(Ne, Ne);
+  /*for(int i = 0; i < Ne; ++i){
     A.row(i) = phi.row(select[i]).cast<double>();
-  }
-  return A.partialPivLu().solve(b);
+  }*/
+  return phi.cast<double>().bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
 
 }
 

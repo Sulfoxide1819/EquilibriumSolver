@@ -113,6 +113,10 @@ private:
   bool check_convergence(const Eigen::VectorXd& residuals,
                          const Eigen::VectorXd& step,
 			 const size_t& iter) const;
+  bool ArmijosCond(const Eigen::VectorXd& x_test,
+                   const Eigen::VectorXd& residuals,
+                   const Eigen::VectorXd& res_test,
+                   const double& lambda);
 
 };
 
