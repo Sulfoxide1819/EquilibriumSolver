@@ -108,9 +108,7 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
     bool find_step = false;
     double lambda = 1;
     for(size_t i = 0; i < 100; ++i){
-      std::cout << iter << ":" << i << "\n";
       Eigen::VectorXd x_test = x - lambda * dx;
-      std::cout << x_test << "\n";
       Eigen::VectorXd conc_test = system.compute_concentrations(x_test.head(n - 1));
       Eigen::VectorXd res_test = system.compute_residuals(x_test, conc_test);
       if(ArmijosCond(x_test, residuals, res_test, lambda)){
@@ -121,8 +119,6 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
         lambda *= 0.1;
       }
     }
-    std::cout << x << "\n";
-    std::cout << dx << "\n";
     if(!find_step && !check_convergence(residuals, dx, iter)){throw std::runtime_error("Convergence error: unstable solution");}
     ++iter;
   } while(!check_convergence(residuals, dx, iter));
