@@ -1,5 +1,5 @@
 {
   "components":["C", "O", "CO", "CO2", "O2"],
-  "temperature": 3000,
-  "initial_mole_fractions":[0.0, 0.33, 0.33, 0.33, 0.0]
+  "temperature": [2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500],
+  "initial_mole_fractions":[0.4, 0.6, 0.0, 0.0, 0.0]
 }
