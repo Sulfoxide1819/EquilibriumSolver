@@ -18,7 +18,7 @@ using EquilibriumSolver::SolverParameters;
     SolverParameters p;
     if(!config.contains("temperature")) throw std::runtime_error("No 'temperature' in 'Parameters'");
     if(config["temperature"].empty()) throw std::runtime_error("'temperature' must be given");
-    p.temperature = config.at("temperature").get<double>();
+    p.temperature = config.at("temperature").get<std::vector<double>>();
     /* 
     if(!config.contains("pressure")) throw std::runtime_error("No 'pressure' in 'Parameters'");
     if(config["pressure"].empty()) throw std::runtime_error("'pressure' must be given");*/

@@ -1,21 +1,17 @@
 #pragma once
 #include <Eigen/Dense>
 #include <cmath>
+#include <vector>
 #include <stdexcept>
 #include "core/types.hpp"
 #include "core/constants.hpp"
 
 namespace EquilibriumSolver {
 
-struct SolverParameters {
+struct MixtureParameters {
   double pressure = p_0;
   double temperature;
-
   Eigen::VectorXd initial_mole_fractions;
-
-  int max_iter = 0;
-  double residual_tolerance = 0;
-  double step_tolerance = 0;
 
   void validate() const {
     if (pressure <= 0) throw std::invalid_argument("Pressure must be positive");
@@ -25,6 +21,27 @@ struct SolverParameters {
     if (std::abs(initial_mole_fractions.sum() - 1.0) > 1e-10)
         throw std::invalid_argument("Initial mole fractions must sum to 1");
   }
+
+};
+
+struct SolverParameters {
+  double get_temperature(bool series = false) {
+    static size_t T_n = 0;
+    if(!series) {
+      return this->temperature[0]; 
+    } else {
+      double T = temperature[T_n];
+      if (++T_n == this->temperature.size()) { T_n = 0; }
+      return T;
+      
+    }
+  }
+  double pressure = p_0;
+  Eigen::VectorXd initial_mole_fractions;
+  std::vector<double> temperature;
+  int max_iter = 0;
+  double residual_tolerance = 0;
+  double step_tolerance = 0;
 };
 
 struct SolverResult {
@@ -61,7 +78,7 @@ class EquilibriumSystem {
 public: 
   EquilibriumSystem(const Mixture& mixture, 
                     const StatSumCache& statsums, 
-                    const SolverParameters& params);
+                    const MixtureParameters& params);
   
   Eigen::VectorXd compute_concentrations(const Eigen::VectorXd& x) const;
   Eigen::VectorXd compute_residuals(const Eigen::VectorXd& x, 
@@ -71,11 +88,11 @@ public:
 
   inline int system_size() const { return Ne_ + 1; }
   const Mixture& get_mixture() const { return mixture; }
-  const SolverParameters& get_params() const { return params; }
+  const MixtureParameters& get_params() const { return params; }
 private:
   const Mixture& mixture;
   const StatSumCache& statsums;
-  const SolverParameters& params;
+  const MixtureParameters& params;
 
   int Ns_;
   int Ne_;
@@ -88,7 +105,7 @@ class InitialGuessFinder {
   public:
     static Eigen::VectorXd find(const Mixture& mixture,
                                 const StatSumCache& statsums,
-                                const SolverParameters& params);    
+                                const MixtureParameters& params);    
 //private:
   static Eigen::VectorXd solve_for_gamma(const Mixture& mixture,
                                           const Eigen::VectorXd& lnZ,
@@ -121,7 +138,7 @@ public:
   EquilibriumCalculator(const Mixture& mixture);
 
   SolverResult calculate(double pressure, double temperature);
-  SolverResult calculate(const SolverParameters& params);
+  std::vector<SolverResult> calculate(const SolverParameters& params);
 
 private:
   const Mixture& mixture;

@@ -34,7 +34,7 @@ void StatSumCache::update(double temperature){
 //EquilibriumSystem
 EquilibriumSystem::EquilibriumSystem(const Mixture& mixture,
                                      const StatSumCache& statsums,
-                                     const SolverParameters& params)
+                                     const MixtureParameters& params)
   : mixture(mixture),
     statsums(statsums),
     params(params),
@@ -120,7 +120,7 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
 //InitialGuessFinder
 Eigen::VectorXd InitialGuessFinder::find(const Mixture& mixture,
                                          const StatSumCache& statsums,
-                                         const SolverParameters& params) {
+                                         const MixtureParameters& params) {
   int Ne = mixture.get_elements().size();
   Eigen::VectorXd initial_guess = Eigen::VectorXd::Zero(Ne + 1);
  
@@ -190,17 +190,24 @@ EquilibriumCalculator::EquilibriumCalculator(const Mixture& mixture)
 
 //EquilibriumCalculator
 
-SolverResult EquilibriumCalculator::calculate(const SolverParameters& params) {
-  double T = params.temperature;
-  statsum_cache.update(T);
-  EquilibriumSystem system(this->mixture, this->statsum_cache, params);
-  NewtonSolver solver;
-  auto results = solver.solve(system, InitialGuessFinder::find(mixture, this->statsum_cache, params));
+std::vector<SolverResult> EquilibriumCalculator::calculate(const SolverParameters& params) {
+  std::vector<SolverResult> results;
+  MixtureParameters mix_params;
+  mix_params.pressure = params.pressure;
+  mix_params.initial_mole_fractions = params.initial_mole_fractions;
+  for (double T : params.temperature){
+    mix_params.temperature = T;
+    this->statsum_cache.update(T);
+    EquilibriumSystem system(this->mixture, this->statsum_cache, mix_params);
+    NewtonSolver solver;
+    auto result = solver.solve(system, InitialGuessFinder::find(mixture, this->statsum_cache, mix_params));
   /*results.concentrations = EquilibriumUtils::potentials_to_concentrations(results.chemical_potentials,
                                                                          this->statsum_cache.get_lnZ(),
                                                                          mixture.get_stoichiometry());*/
-  results.mole_fractions = EquilibriumUtils::concentrations_to_mole_fractions(results.concentrations, results.total_density());
-  return results;
+    result.mole_fractions = EquilibriumUtils::concentrations_to_mole_fractions(result.concentrations, result.total_density());
+    results.push_back(std::move(result));
+  }
+  return std::move(results);
 }
 //EquilibriumUtils
 
