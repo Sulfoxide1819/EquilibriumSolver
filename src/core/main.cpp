@@ -62,9 +62,9 @@ int main(int argc, char* argv[]) {
     //initial_mole_frac << 0.00, 0.33, 0.33, 0.33, 0.00;
     //params.initial_mole_fractions = initial_mole_frac;
     
-    params.max_iter = 100;
-    params.residual_tolerance = 1e-10;
-    params.step_tolerance = 1e-8;
+    params.max_iter = 1e4;
+    params.residual_tolerance = 1e+11;
+    params.step_tolerance = 1e-16;
 
 //OUTPUT
     vector<SolverResult> results = calculator.calculate(params);

@@ -39,9 +39,9 @@ struct SolverParameters {
   double pressure = p_0;
   Eigen::VectorXd initial_mole_fractions;
   std::vector<double> temperature;
-  int max_iter = 0;
-  double residual_tolerance = 0;
-  double step_tolerance = 0;
+  int max_iter = 100;
+  double residual_tolerance = 1e+10;
+  double step_tolerance = 1e-10;
 };
 
 struct SolverResult {
@@ -67,6 +67,7 @@ public:
 
   const Eigen::VectorXd& get_lnZ() const { return lnZ_; }
   const Eigen::VectorXd& get_Z() const { return Z_; }
+  const double get_cached_temperature() { return cached_temperature; }
 private:
   const Mixture& mixture;
   double cached_temperature = 0.0;
@@ -89,6 +90,7 @@ public:
   inline int system_size() const { return Ne_ + 1; }
   const Mixture& get_mixture() const { return mixture; }
   const MixtureParameters& get_params() const { return params; }
+  size_t get_Ne() const { return Ne_; }
 private:
   const Mixture& mixture;
   const StatSumCache& statsums;
@@ -121,6 +123,14 @@ public:
     double residual_tolerance = 1e+10;
     double step_tolerance = 1e-12;
   };
+  void set_options(const Options& opt){ this->options = opt;}
+  void set_options(const SolverParameters& params){
+    Options options;
+    options.max_iter = params.max_iter;
+    options.residual_tolerance = params.residual_tolerance;
+    options.step_tolerance = params.step_tolerance;
+    this->options = std::move(options);
+  }
 
   SolverResult solve(const EquilibriumSystem& system, 
 		     const Eigen::VectorXd& initial_guess);

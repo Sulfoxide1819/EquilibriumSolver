@@ -146,7 +146,7 @@ double StatSum::total(const Component& comp, double T) {
     return res;}*/
   double exp_term = std::exp(comp.dissociation_energy / (K * T * NA));
   double Z_total = translational(comp, T) * rotational(comp, T) * vibrational(comp, T) * electronic(comp, T) * exp_term;
-  std::cout << "Z_total(" + comp.name + "): " << Z_total << "\n";
+  //std::cout << "Z_total(" + comp.name + "): " << Z_total << "\n";
   return Z_total;
 }
 

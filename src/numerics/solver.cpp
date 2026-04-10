@@ -103,8 +103,8 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
     residuals = system.compute_residuals(x, concentrations);
     Eigen::MatrixXd jacobian = system.compute_jacobian(x, concentrations);
     dx = jacobian.partialPivLu().solve(residuals);
-    if(dx(n - 1) > 1.0) {dx(n - 1) = 1;}
-    if(dx(n - 1) < -1.0) {dx(n - 1) = -1;}
+    if(dx(n - 1) > 2.0) {dx(n - 1) = 2.0;}
+    if(dx(n - 1) < -2.0) {dx(n - 1) = -2.0;}
     bool find_step = false;
     double lambda = 1;
     for(size_t i = 0; i < 100; ++i){
@@ -216,11 +216,22 @@ std::vector<SolverResult> EquilibriumCalculator::calculate(const SolverParameter
   mix_params.pressure = params.pressure;
   mix_params.initial_mole_fractions = params.initial_mole_fractions;
   for (double T : params.temperature){
+    double prev_T = this->statsum_cache.get_cached_temperature();
     mix_params.temperature = T;
     this->statsum_cache.update(T);
     EquilibriumSystem system(this->mixture, this->statsum_cache, mix_params);
+
     NewtonSolver solver;
-    auto result = solver.solve(system, InitialGuessFinder::find(mixture, this->statsum_cache, mix_params));
+    solver.set_options(params);
+    
+    Eigen::VectorXd initial_guess = Eigen::VectorXd::Zero(system.get_Ne() + 1);
+    if(prev_T != 0.0 && (prev_T - T) <= 1000) {
+      initial_guess.head(system.get_Ne()) = results[(results.size() - 1)].chemical_potentials;
+      initial_guess(system.get_Ne()) = results[(results.size() - 1)].log_total_density;
+    } else {
+      initial_guess = InitialGuessFinder::find(mixture, this->statsum_cache, mix_params);
+    }
+    auto result = solver.solve(system, initial_guess);
   /*results.concentrations = EquilibriumUtils::potentials_to_concentrations(results.chemical_potentials,
                                                                          this->statsum_cache.get_lnZ(),
                                                                          mixture.get_stoichiometry());*/
