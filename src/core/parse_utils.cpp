@@ -19,7 +19,7 @@ using json = nlohmann::json;
 
     comp.molar_mass = comp_data.at("molar_mass").get<double>();
     comp.is_atomic = comp_data.at("is_atomic").get<bool>();
-    if(!comp.energy_levels.empty()) {
+    if(comp_data.contains("energy_levels")) {
       for(const auto& lvl : comp_data["energy_levels"]){
         Component::EnergyLevel level;
         level.state = lvl.at("state").get<std::string>();
@@ -51,11 +51,14 @@ using json = nlohmann::json;
            }
          }
          comp.vib_model = std::make_unique<CO2_model>(diss_energy, freqs_, anh);
+       } else if (comp.name == "O2") {
+        comp.vib_model = std::make_unique<HarmonicOscillator>(freqs_);
+
        }
-       else if(comp_data.contains("anharmonic_constants_2")){
+       else /*if(comp_data.contains("anharmonic_constants_2")){
          std::vector<double> omega_x = comp_data["anharmonic_constants_2"].get<std::vector<double>>();
          comp.vib_model = std::make_unique<AnharmonicOscillator>(diss_energy, freqs_, omega_x);
-       } else {
+       } else */{
          comp.vib_model = std::make_unique<HarmonicOscillator>(freqs_);
        }
      }
