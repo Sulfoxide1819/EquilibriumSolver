@@ -24,43 +24,24 @@ int main(int argc, char* argv[]) {
     vector<Component> components = read.components();
     cout << "=== Starting Equilibrium Solver ===" << endl;
     SolverParameters params = read.params();
-/*
-    SolverParameters params;
-    params.pressure = 1 * 101.325; // Па
-    params.temperature = 3000.0; // K
-*/ 
-    //vector<Component> components = {Component("N"),Component("O"), Component("N2"), Component("O2"), Component("NO")};
-    //vector<Component> components = {Component("e-"),Component("N"),Component("O"), Component("Ar"), Component("N2"), Component("O2"),Component("NO"),Component("N+"),Component("O+"),Component("Ar+"),Component("NO+")};
-    //vector<Component> components = {Component("C"),Component("O"), Component("CO"), Component("CO2"), Component("O2")};
 
     ifstream f("../data/molecules.json");
     nlohmann::json data = nlohmann::json::parse(f);
     nlohmann::json data_thermo = nlohmann::json::parse(ifstream("../data/gibbs_entalpy.json"));
     for(auto& comp : components){
-//      if(MixtureBuild::pull_thermo(data_thermo, comp, params.temperature)){
         MixtureBuild::pull_properties(data, comp);
-//      }
+      }
     }
-    //vector<Element> elements = {Element("N"), Element("O")};
-    //vector<Element> elements = {Element("e-"), Element("N"), Element("O"), Element("Ar")};
-    //vector<Element> elements = {Element("C"), Element("O")};
     vector<Element> elements = MixtureBuild::get_elements(data, components);
     for(auto& el : elements) {
       MixtureBuild::get_stoichiometry(data, el, components);
     }   
  // Mixture init
     Mixture mixture(components, elements);
- // cout << mixture.get_stoichiometry() << "\n";
     //Calculator init
     EquilibriumCalculator calculator(mixture);
 
     
-    //Eigen::VectorXd initial_mole_frac(components.size());
-    //initial_mole_frac << 0.0, 0.0, 0.8, 0.2, 0.0;
-    //initial_mole_frac << 0.0, 0.0, 0.0, 0.01, 0.78, 0.21 , 0.0, 0.0, 0.0, 0.0, 0.0;
-    //initial_mole_frac << 0.03, 0.45, 0.51, 0.005, 0.005; 
-    //initial_mole_frac << 0.00, 0.33, 0.33, 0.33, 0.00;
-    //params.initial_mole_fractions = initial_mole_frac;
     
     params.max_iter = 1e4;
     params.residual_tolerance = 1e+11;

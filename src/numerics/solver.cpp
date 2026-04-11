@@ -19,12 +19,7 @@ void StatSumCache::update(double temperature){
   Eigen::VectorXd statsums(this->mixture.get_components().size());
   int k = 0;
   for (const auto& comp : this->mixture.get_components()) {
-    if(comp.reduced_gibbs_energy == 0.0){
-      statsums(k) = std::log(StatSum::total(comp, temperature));
-    } else {
-      statsums(k) = StatSum::fromReducedGibbs(comp, temperature);
-    }
-   
+    statsums(k) = std::log(StatSum::total(comp, temperature));
     k++;
   }
   this->lnZ_ = statsums;
@@ -43,9 +38,9 @@ EquilibriumSystem::EquilibriumSystem(const Mixture& mixture,
 {}
 
 Eigen::VectorXd EquilibriumSystem::compute_concentrations(const Eigen::VectorXd& gamma) const {
-  double coeff = params.pressure / (K * NA * params.temperature);
+  double coeff = params.pressure / (K * params.temperature);
   Eigen::VectorXd to_exp =( this->statsums.get_lnZ() + 
-                           this->mixture.get_stoichiometry().cast<double>()  * gamma).array() + std::log(coeff);
+                           this->mixture.get_stoichiometry().cast<double>()  * gamma).array();// + std::log(coeff);
   return to_exp.array().exp();
 }
 
@@ -144,26 +139,26 @@ Eigen::VectorXd InitialGuessFinder::find(const Mixture& mixture,
                                          const MixtureParameters& params) {
   int Ne = mixture.get_elements().size();
   Eigen::VectorXd initial_guess = Eigen::VectorXd::Zero(Ne + 1);
- 
-  initial_guess.head(Ne) = solve_for_gamma(mixture, statsums.get_lnZ(), params.initial_mole_fractions);
-
   double n_sigma_0 = params.pressure / (K * params.temperature);
+  initial_guess.head(Ne) = solve_for_gamma(mixture, statsums.get_lnZ(), params.initial_mole_fractions, n_sigma_0);
+
   initial_guess(Ne) = std::log(n_sigma_0);
   return initial_guess;
 }
 
 Eigen::VectorXd InitialGuessFinder::solve_for_gamma(const Mixture& mixture,
                                                     const Eigen::VectorXd& lnZ,
-                                                    const Eigen::VectorXd& initial_chi){
+                                                    const Eigen::VectorXd& initial_chi,
+                                                    const double& n_sigma_0){
   int Ns = mixture.get_components().size();
   const Eigen::MatrixXi& phi = mixture.get_stoichiometry();
  // std::vector<int> select = select_equations(mixture, initial_chi);
   Eigen::VectorXd b = Eigen::VectorXd::Zero(Ns);
   for(int i = 0; i < Ns; ++i){
     if(initial_chi[i] == 0) {
-      b(i) = std::log(1e-9) - lnZ(i) + std::log(NA);
+      b(i) = std::log(1e-9) - lnZ(i) + std::log( n_sigma_0 );
     } else {
-      b(i) = std::log(initial_chi(i)) - lnZ(i) + std::log(NA);
+      b(i) = std::log(initial_chi(i)) - lnZ(i) + std::log( n_sigma_0 );
     }
   }
   //Eigen::MatrixXd A = Eigen::MatrixXd::Zero(Ne, Ne);

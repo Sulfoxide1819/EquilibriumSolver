@@ -30,7 +30,6 @@ double StatSum::electronic(const Component& comp, double T){
   double Z_el = 0;
   for(const auto& level : comp.energy_levels){
     double to_exp_term = -h * c * level.energy * 100.0 / (K * T);
-    if (SIMPLE_EL_STATSUM) { return level.degeneracy; }
     Z_el += level.degeneracy * std::exp(to_exp_term);
   }
   return Z_el;
