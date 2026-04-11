@@ -111,7 +111,8 @@ class InitialGuessFinder {
 //private:
   static Eigen::VectorXd solve_for_gamma(const Mixture& mixture,
                                           const Eigen::VectorXd& lnZ,
-                                          const Eigen::VectorXd& initial_chi);
+                                          const Eigen::VectorXd& initial_chi,
+                                          const double& n_sigma_0);
   static std::vector<int> select_equations(const Mixture& mixture,
                                           const Eigen::VectorXd& initial_chi);
 };

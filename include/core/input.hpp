@@ -14,3 +14,7 @@ public:
 private:
   const nlohmann::json& config;
 };
+/*
+struct JANAF_DIR {
+  
+};*/

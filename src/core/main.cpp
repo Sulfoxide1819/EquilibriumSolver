@@ -30,7 +30,6 @@ int main(int argc, char* argv[]) {
     nlohmann::json data_thermo = nlohmann::json::parse(ifstream("../data/gibbs_entalpy.json"));
     for(auto& comp : components){
         MixtureBuild::pull_properties(data, comp);
-      }
     }
     vector<Element> elements = MixtureBuild::get_elements(data, components);
     for(auto& el : elements) {

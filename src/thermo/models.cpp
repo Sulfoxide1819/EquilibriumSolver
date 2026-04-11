@@ -23,12 +23,16 @@ double AnharmonicOscillator::compute(double T) const {
     double e_base = freqs_[0] * 0.5 - omega_x[0] * 0.25;
     double e = 0;
     double Z_vib = 0;
+    size_t v_max = 39;
+
     while(true){
       e = freqs_[0] * (v + 0.5) - omega_x[0] * (v + 0.5) * (v + 0.5);
       e = (e - e_base) * h * c;
       if(e < diss_energy) {
-        Z_vib += std::exp(-e / (K * T));
-        ++v;
+        double e_level = std::exp(-e / (K * T));
+        if (e_level < 1e-6 || v > v_max) { break;}
+        Z_vib += e_level;
+        ++v; 
       } else { break; }
     }
     return Z_vib;
@@ -37,7 +41,7 @@ double AnharmonicOscillator::compute(double T) const {
 
 double CO2_model::compute(double T) const {
   std::vector<unsigned> lim = {34, 67, 20};
-
+  double cut_energy = 8.83859e-19;
   double Z_vib = 0;
 
   for(int i = 0; i < lim[0]; ++i){
@@ -50,7 +54,7 @@ double CO2_model::compute(double T) const {
         double e_anh = l.transpose() * aharmonic_constants2 * l;//anharmonic term
         double e = (e_har + e_anh) * h * c;
 
-        if(e < diss_energy) { Z_vib += (j + 1) * std::exp(-e / (K * T)); }
+        if(e < cut_energy) { Z_vib += (j + 1) * std::exp(-e / (K * T)); }
         else { break; }
       }
     }
