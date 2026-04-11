@@ -100,24 +100,39 @@
 
     "energy_levels":[
       {
-        "state": "Sigma^{-}_g",
+        "state": "X^3Sigma^{-}_g",
         "T_i": 0,
-        "p_i": 1
+        "p_i": 3
       },      
       {
-        "state": "Delta_g",
+        "state": "a^1Delta_g",
         "T_i": 7917.54,
         "p_i": 2
       },
       {
-        "state": "Sigma^{+}_g",
+        "state": "b^1Sigma^{+}_g",
         "T_i": 13195.07,
         "p_i": 1
       },
       {
-        "state": "Sigma^{-}_u",
+        "state": "c^1Sigma^{-}_u",
         "T_i": 33055.71,
         "p_i": 1
+      },
+      {
+        "state": "A^3Delta_u",
+        "T_i": 34690.91,
+        "p_i": 6
+      },
+      {
+        "state": "B^3Sigma^{+}_u",
+        "T_i": 35393.08,
+        "p_i": 3
+      },
+      {
+        "state": "C^3Sigma^{-}_u",
+        "T_i": 49792.11,
+        "p_i": 3
       }
     ],
 
@@ -136,6 +151,11 @@
     "is_atomic": false,
 
     "energy_levels":[
+      {
+        "state": "X^2Pi_r",
+        "T_i": 0.0,
+        "p_i": 4
+      },
       {
         "state": "a^4Pi_i",
         "T_i": 38000,
@@ -488,11 +508,27 @@
 
     "energy_levels":[
       {
-        "state": "a^3PI",
+        "state": "X^1Sigma^{+}",
+        "T_i": 0.0,
+        "p_i": 1
+      },
+      {
+        "state": "a^3Pi",
         "T_i": 48686.79,
         "p_i": 6
+      },
+      {
+        "state": "a'^3Sigma^{+}",
+        "T_i": 55825.65,
+        "p_i": 0
+      },
+      {
+        "state": "d^3Delta",
+        "T_i": 61123.9,
+        "p_i": 0
       }
     ],
+    "anharmonic_constants_2": [1328.8421],
     "stoichiometry": {
       "C": 1,
       "O": 1
@@ -507,6 +543,11 @@
     "is_atomic": false,
 
     "energy_levels":[
+      {
+        "state": "X^1Sigma^{+}_g",
+        "T_i": 0.0,
+        "p_i": 1
+      },
       {
         "state": "^3Sigma_g^+",
         "T_i": 30000,
