@@ -18,3 +18,4 @@ private:
 struct JANAF_DIR {
   
 };*/
+std::vector<double> parseTemperatureRange(const std::string&);
