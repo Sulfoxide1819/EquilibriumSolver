@@ -102,7 +102,7 @@ SolverResult NewtonSolver::solve(const EquilibriumSystem& system,
     if(dx(n - 1) < -2.0) {dx(n - 1) = -2.0;}
     bool find_step = false;
     double lambda = 1;
-    for(size_t i = 0; i < 100; ++i){
+    for(size_t i = 0; i < 1000; ++i){
       Eigen::VectorXd x_test = x - lambda * dx;
       Eigen::VectorXd conc_test = system.compute_concentrations(x_test.head(n - 1));
       Eigen::VectorXd res_test = system.compute_residuals(x_test, conc_test);

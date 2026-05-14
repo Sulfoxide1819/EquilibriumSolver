@@ -145,8 +145,8 @@
   "NO": {
     "molar_mass": 30.0061e-3,
     "dissociation_energy": 6.38191e5,
-    "vibrational_freq": [2.16981e5],
-    "rotational_const": 167.20,
+    "vibrational_freq": [1.904405e5],
+    "rotational_const": 170.427,
     "symmetry_factor": 1,
     "is_atomic": false,
 
@@ -165,6 +165,31 @@
     "stoichiometry": {
       "N": 1,
       "O": 1
+    }
+  },
+  "NO2": {
+    "molar_mass": 46.0055e-3,
+    "dissociation_energy": 9.27384e5,
+    "vibrational_freq": [1.31995e5,0.74960e5,1.61605e5],
+    "rotational_const": [770,46,43],
+    "symmetry_factor": 1,
+    "is_atomic": false,
+
+    "energy_levels":[
+      {
+        "state": "X^2Pi_r",
+        "T_i": 0.0,
+        "p_i": 4
+      },
+      {
+        "state": "a^4Pi_i",
+        "T_i": 38000,
+        "p_i": 8
+      }
+    ],
+    "stoichiometry": {
+      "N": 1,
+      "O": 2
     }
   },
   "e-": {
@@ -257,6 +282,7 @@
   },
   "Ar+": {
     "molar_mass": 39.948e-3,
+    "dissociation_energy": -1.5206e6,
     "is_atomic": true,
     "energy_levels": [
       {
@@ -312,6 +338,7 @@
   },
   "O+": {
     "molar_mass": 15.9994e-3,
+    "dissociation_energy": -1.3139e6,
     "is_atomic": true,
     "energy_levels": [
       {
@@ -347,6 +374,7 @@
   },
   "N+": {
     "molar_mass": 14.007e-3,
+    "dissociation_energy": -1.4023e6,
     "is_atomic": true,
     "energy_levels": [
       {
@@ -402,9 +430,9 @@
   },
   "NO+": {
     "molar_mass": 30.0061e-3,
-    "dissociation_energy": 6.2685e5,
-    "vibrational_freq": [2.16981e5],
-    "rotational_const": 167.20,
+    "dissociation_energy": -2.666384e5,
+    "vibrational_freq": [2.3775e5],
+    "rotational_const": 199.82,
     "symmetry_factor": 1,
     "is_atomic": false,
 
@@ -412,6 +440,131 @@
       "N": 1,
       "O": 1,
       "e-": -1
+    }
+  },
+  "N2+": {
+    "molar_mass": 28.0134e-3,
+    "dissociation_energy": -5.6142e5,
+    "vibrational_freq": [2.20808e5],
+    "rotational_const": 199.8,
+    "symmetry_factor": 2,
+    "is_atomic": false,
+
+    "energy_levels": [
+      {
+        "state": "X^2Sigma_g^+",
+        "T_i": 0.0,
+        "p_i": 2
+      },
+      {
+        "state": "A^2Pi_u",
+        "T_i": 9167.6,
+        "p_i": 4
+      },
+      {
+        "state": "B^2Sigma_u^+",
+        "T_i": 25462,
+        "p_i": 2
+      },
+      {
+        "state": "C^2Pi_g",
+        "T_i": 52816,
+        "p_i": 4
+      }
+    ],
+    "stoichiometry": {
+      "N": 2,
+      "e-": -1
+    }
+  },
+   "O2+": {
+    "molar_mass": 31.9988e-3,
+    "dissociation_energy": -6.7142e5,
+    "vibrational_freq": [1.90513e5],
+    "rotational_const": 168.9,
+    "symmetry_factor": 2,
+    "is_atomic": false,
+
+    "energy_levels":[
+      {
+        "state": "X^2Pi_g",
+        "T_i": 0,
+        "p_i": 4
+      },
+      {
+        "state": "a^4Pi_u",
+        "T_i": 32913,
+        "p_i": 8
+      },
+      {
+        "state": "A^2Pi_u",
+        "T_i": 40572,
+        "p_i": 4
+      },
+      {
+        "state": "^6Sigma_u^+",
+        "T_i": 40600,
+        "p_i": 6
+      },
+      {
+        "state": "b^4Sigma_g^+",
+        "T_i": 43300,
+        "p_i": 4
+      },
+      {
+        "state": "B^2Sigma_u^+",
+        "T_i": 46800,
+        "p_i": 2
+      },
+      {
+        "state": "c^4Sigma_g^-",
+        "T_i": 49500,
+        "p_i": 4
+      },
+      {
+        "state": "C^2Phi_u",
+        "T_i": 53200,
+        "p_i": 4
+      },
+      {
+        "state": "D^2Pi_u",
+        "T_i": 61300,
+        "p_i": 4
+      },
+      {
+        "state": "E^2Delta_g",
+        "T_i": 61800,
+        "p_i": 4
+      },
+      {
+        "state": "d^4Delta_g",
+        "T_i": 65500,
+        "p_i": 8
+      },
+      {
+        "state": "F^2Pi_g",
+        "T_i": 66000,
+        "p_i": 4
+      },
+      {
+        "state": "G^2Sigma_g^-",
+        "T_i": 66668,
+        "p_i": 2
+      },
+      {
+        "state": "H^2Sigma_g^+",
+        "T_i": 69400,
+        "p_i": 2
+      },
+      {
+        "state": "e^4Sigma_u^+",
+        "T_i": 72000,
+        "p_i": 4
+      }
+    ],
+    "stoichiometry": {
+      "O": 2,
+      "e-":-1
     }
   },
   "C": {
@@ -520,12 +673,12 @@
       {
         "state": "a'^3Sigma^{+}",
         "T_i": 55825.65,
-        "p_i": 0
+        "p_i": 3
       },
       {
         "state": "d^3Delta",
         "T_i": 61123.9,
-        "p_i": 0
+        "p_i": 6
       }
     ],
     "anharmonic_constants_2": [1328.8421],
@@ -578,19 +731,5 @@
     }
   }
 }
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
 
 

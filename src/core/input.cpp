@@ -71,7 +71,7 @@ using EquilibriumSolver::SolverParameters;
     if (start > end) throw std::runtime_error("Start must be less than end");
 
     std::vector<double> temps;
-    for (size_t i = start; i <= end + 1e-9 * step; i += step) {
+    for (double i = start; i <= end + 1e-9 * step; i += step) {
       temps.push_back(i);
     }
     return temps;

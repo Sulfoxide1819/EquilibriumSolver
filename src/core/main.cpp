@@ -104,6 +104,9 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < result.chemical_potentials.size(); ++i) {
       cout << "  " << elements[i].name << ": " << result.chemical_potentials(i) << "\n";
     }
+   /* for(auto res : results){
+      cout << res.iterations << "\n";
+    }*/
         
   } catch (const exception& e) {
     cerr << "Error: " << e.what() << endl;

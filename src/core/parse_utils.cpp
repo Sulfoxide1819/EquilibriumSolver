@@ -28,6 +28,7 @@ using json = nlohmann::json;
         comp.energy_levels.push_back(level);
       } 
      } 
+     if (comp_data.contains("dissociation_energy")) { comp.dissociation_energy = comp_data["dissociation_energy"].get<double>(); }
      if(!comp.is_atomic) {
        comp.dissociation_energy = comp_data["dissociation_energy"].get<double>();
          //comp.vibrational_freq = comp_data["vibrational_freq"].get<std::vector<double>>();
